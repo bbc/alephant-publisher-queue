@@ -23,7 +23,7 @@ module Alephant
         end
 
         def storage
-          @storage ||= Alephant::Cache.new(config.fetch(:s3_bucket_id), config.fetch(:s3_object_path))
+          @storage ||= Alephant::Storage.new(config.fetch(:s3_bucket_id), config.fetch(:s3_object_path))
         end
 
         def lookup
