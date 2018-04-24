@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "dalli-elasticache"
   spec.add_runtime_dependency "alephant-support"
   spec.add_runtime_dependency "alephant-sequencer", "~> 3"
-  spec.add_runtime_dependency "alephant-cache"
+  spec.add_runtime_dependency "alephant-storage"
   spec.add_runtime_dependency "alephant-logger", "~> 3.1"
   spec.add_runtime_dependency "alephant-lookup", "~> 2"
   spec.add_runtime_dependency "alephant-renderer"

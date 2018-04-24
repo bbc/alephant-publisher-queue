@@ -1,6 +1,6 @@
 require "crimp"
 
-require "alephant/cache"
+require "alephant/storage"
 require "alephant/lookup"
 require "alephant/logger"
 require "alephant/sequencer"
@@ -13,7 +13,7 @@ module Alephant
       class Writer
         include Alephant::Logger
 
-        attr_reader :config, :message, :cache, :parser
+        attr_reader :config, :message, :storage, :parser
 
         def initialize(config, message)
           @config   = config
@@ -24,8 +24,8 @@ module Alephant
           @renderer ||= Alephant::Renderer.create(config, data)
         end
 
-        def cache
-          @cache ||= Alephant::Cache.new(
+        def storage
+          @storage ||= Alephant::Storage.new(
             config[:s3_bucket_id],
             config[:s3_object_path]
           )
@@ -93,7 +93,7 @@ module Alephant
             storage_opts: storage_opts
           )
 
-          cache.put(location, render, view.content_type, storage_opts).tap do
+          storage.put(location, render, view.content_type, storage_opts).tap do
             logger.info(
               "event"          => "MessageStored",
               "location"       => location,

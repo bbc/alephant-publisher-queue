@@ -25,7 +25,7 @@ RSpec.describe Alephant::Publisher::Queue::RevalidateWriter do
   end
 
   describe '#run!' do
-    let(:storage_double)  { instance_double(Alephant::Cache, put: nil) }
+    let(:storage_double)  { instance_double(Alephant::Storage, put: nil) }
     let(:lookup_double)   { instance_double(Alephant::Lookup::LookupHelper, write: nil) }
     let(:renderer_double) do
       instance_double(Alephant::Renderer::Renderer, views: { hello_world_view: hello_world_view })
@@ -39,7 +39,7 @@ RSpec.describe Alephant::Publisher::Queue::RevalidateWriter do
 
     before do
       allow(Alephant::Renderer).to receive(:create).and_return(renderer_double)
-      allow(Alephant::Cache).to receive(:new).and_return(storage_double)
+      allow(Alephant::Storage).to receive(:new).and_return(storage_double)
       allow(Alephant::Lookup).to receive(:create).and_return(lookup_double)
     end
 
@@ -84,7 +84,7 @@ RSpec.describe Alephant::Publisher::Queue::RevalidateWriter do
 
   describe '#storage' do
     it 'builds an Alephant::Cache object' do
-      expect(subject.storage).to be_a(Alephant::Cache)
+      expect(subject.storage).to be_a(Alephant::Storage)
     end
   end
 

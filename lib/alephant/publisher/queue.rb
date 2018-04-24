@@ -8,7 +8,7 @@ require "alephant/publisher/queue/sqs_helper/archiver"
 require "alephant/publisher/queue/processor"
 require "alephant/publisher/queue/revalidate_processor"
 require "alephant/logger"
-require "alephant/cache"
+require "alephant/storage"
 require "json"
 
 module Alephant
