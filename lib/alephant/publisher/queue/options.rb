@@ -1,4 +1,4 @@
-require "aws-sdk"
+require "aws-sdk-sqs"
 require "alephant/logger"
 
 module Alephant

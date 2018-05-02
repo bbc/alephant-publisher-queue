@@ -2,12 +2,12 @@ require "spec_helper"
 
 describe Alephant::Publisher::Queue::SQSHelper::Archiver do
   let(:storage) { instance_double(Alephant::Storage, :put => nil) }
-  let(:queue)    { instance_double(AWS::SQS::Queue, :url => nil) }
+  let(:queue)    { instance_double(Aws::SQS::Queue, :url => nil) }
   let(:msg_body) { { :Message => JSON.generate(msg_uri) } }
   let(:msg_uri)  { { :uri => "/content/asset/newsbeat" } }
   let(:message) do
     instance_double(
-      "AWS::SQS::ReceivedMessage",
+      "Aws::SQS::ReceivedMessage",
       :id    => "id",
       :md5   => "qux",
       :queue => queue,

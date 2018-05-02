@@ -1,7 +1,7 @@
 $LOAD_PATH << File.join(File.dirname(__FILE__), "..", "lib")
 
 require "pry"
-require "aws-sdk"
+require "aws-sdk-sqs"
 require "simplecov"
 
 SimpleCov.start do

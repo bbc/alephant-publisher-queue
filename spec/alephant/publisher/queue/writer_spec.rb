@@ -15,8 +15,6 @@ describe Alephant::Publisher::Queue::Writer do
   end
 
   before(:each) do
-    AWS.stub!
-
     allow_any_instance_of(Alephant::Storage).to receive(:initialize)
       .with(
         opts[:s3_bucket_id],

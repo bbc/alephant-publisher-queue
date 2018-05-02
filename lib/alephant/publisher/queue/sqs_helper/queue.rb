@@ -1,4 +1,4 @@
-require "aws-sdk"
+require "aws-sdk-sqs"
 require "alephant/logger"
 
 module Alephant
@@ -27,7 +27,7 @@ module Alephant
           end
 
           def message
-            receive.tap { |m| process(m) unless m.nil? }
+            receive.tap { |m| process(m) }
           end
 
           private
@@ -43,13 +43,16 @@ module Alephant
           end
 
           def process(m)
+            return unless m.size > 0
+
             logger.metric "MessagesReceived"
             logger.info(
               "event"     => "QueueMessageReceived",
-              "messageId" => m.id,
+              "messageId" => m.first.message_id,
               "method"    => "#{self.class}#process"
             )
-            archive m
+            # @TODO: Look at archiver as should support message from collection.
+            archive m.first
           end
 
           def archive(m)
@@ -66,9 +69,10 @@ module Alephant
           end
 
           def receive
-            queue.receive_message(
-              :visibility_timeout => timeout,
-              :wait_time_seconds  => wait_time
+            queue.receive_messages(
+              :visibility_timeout     => timeout,
+              :wait_time_seconds      => wait_time,
+              :max_number_of_messages => 1
             )
           end
         end
