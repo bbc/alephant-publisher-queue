@@ -11,11 +11,12 @@ describe Alephant::Publisher::Queue::Processor do
     ).to receive(:run!)
   end
 
-  describe "#consume(msg)" do
+  describe "#consume" do
     it "Consume the message and deletes it" do
-      msg = instance_double(Aws::SQS::Message, :delete => nil)
-      expect(msg).to receive(:delete)
-      subject.consume(msg)
+      message = instance_double(Aws::SQS::Message, :delete => nil)
+      message_collection = [message]
+      expect(message).to receive(:delete)
+      subject.consume(message_collection)
     end
   end
 end

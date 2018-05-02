@@ -4,6 +4,8 @@ require "pry"
 require "aws-sdk-sqs"
 require "simplecov"
 
+ENV['AWS_REGION'] = 'eu-west-1'
+
 SimpleCov.start do
   add_filter "/spec/"
 end
