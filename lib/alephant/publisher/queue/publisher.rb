@@ -66,7 +66,6 @@ module Alephant
           options = {}
           options[:endpoint] = ENV['AWS_SQS_ENDPOINT'] if ENV['AWS_SQS_ENDPOINT']
           options[:region]   = get_region
-          options[:queue_owner_aws_account_id] = opts.queue[:aws_account_id] if opts.queue[:aws_account_id]
 
           logger.info(
             "event"   => "SQSQueueOptionsConfigured",
@@ -78,7 +77,11 @@ module Alephant
         end
 
         def aws_queue
-          queue_url = sqs_client.get_queue_url(queue_name: opts.queue[:sqs_queue_name]).queue_url
+          options = { queue_name: opts.queue[:sqs_queue_name] }
+          options[:queue_owner_aws_account_id] = opts.queue[:aws_account_id] if opts.queue[:aws_account_id]
+
+          queue_url = sqs_client.get_queue_url(options).queue_url
+
           resource = Aws::SQS::Resource.new(client: sqs_client)
           resource.queue(queue_url)
         end
