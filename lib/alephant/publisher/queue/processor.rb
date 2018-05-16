@@ -10,10 +10,12 @@ module Alephant
           @opts = opts
         end
 
-        def consume(msg)
-          return if msg.nil?
-          write(msg)
-          msg.delete
+        def consume(message_collection)
+          return unless message_collection && message_collection.size > 0
+
+          message = message_collection.first
+          write(message)
+          message.delete
         end
 
         private

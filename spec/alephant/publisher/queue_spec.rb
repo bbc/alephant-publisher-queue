@@ -1,19 +1,20 @@
 require "spec_helper"
 
 describe Alephant::Publisher::Queue do
-  let(:options)       { Alephant::Publisher::Queue::Options.new }
-  let(:queue)         { double(AWS::SQS::Queue, :url => nil) }
-  let(:client_double) { double(AWS::SQS, :queues => queue_double) }
-  let(:queue_double) do
-    double("AWS::SQS::QueueCollection", :[] => queue, :url_for => nil)
-  end
+  let(:options)     { Alephant::Publisher::Queue::Options.new }
+  let(:fake_client) { Aws::SQS::Client.new(stub_responses: true) }
 
   before(:each) do
-    expect(AWS::SQS).to receive(:new).and_return(client_double)
+    allow_any_instance_of(Alephant::Publisher::Queue::Publisher).to receive(:sqs_client).and_return(fake_client)
+    fake_client.stub_responses(:get_queue_url, { queue_url: 'http://sqs.aws.myqueue/id' })
   end
 
   describe ".create" do
     it "sets parser, sequencer, queue and writer" do
+      options.add_queue(
+        :sqs_queue_name => "bar",
+        :aws_account_id => "foo"
+      )
       instance = Alephant::Publisher::Queue.create(options)
       expect(instance.queue)
         .to be_a Alephant::Publisher::Queue::SQSHelper::Queue
@@ -27,12 +28,9 @@ describe Alephant::Publisher::Queue do
           :aws_account_id => "foo"
         )
 
-        expect(queue_double).to receive(:url_for).with(
-          "bar",
-          :queue_owner_aws_account_id => "foo"
-        )
+        publisher = Alephant::Publisher::Queue.create(options)
 
-        Alephant::Publisher::Queue.create(options)
+        expect(publisher.queue.queue).to be_a(Aws::SQS::Queue)
       end
     end
 
@@ -41,9 +39,9 @@ describe Alephant::Publisher::Queue do
         options = Alephant::Publisher::Queue::Options.new
         options.add_queue(:sqs_queue_name => "bar")
 
-        expect(queue_double).to receive(:url_for).with("bar", {})
+        publisher = Alephant::Publisher::Queue.create(options)
 
-        Alephant::Publisher::Queue.create(options)
+        expect(publisher.queue.queue).to be_a(Aws::SQS::Queue)
       end
     end
   end

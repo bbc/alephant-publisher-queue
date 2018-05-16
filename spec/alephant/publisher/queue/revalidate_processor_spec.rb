@@ -32,7 +32,8 @@ RSpec.describe Alephant::Publisher::Queue::RevalidateProcessor do
   let(:cache_double)       { instance_double(Dalli::Client, delete: nil) }
   let(:elasticache_double) { instance_double(Dalli::ElastiCache, client: cache_double) }
 
-  let(:message)      { instance_double(AWS::SQS::ReceivedMessage, body: JSON.generate(message_body), delete: nil) }
+  let(:message)      { instance_double(Aws::SQS::Message, body: JSON.generate(message_body), delete: nil) }
+  let(:message_collection) { [message] }
   let(:message_body) { { id: '', batch_id: '', options: {} } }
 
   before do
@@ -64,7 +65,7 @@ RSpec.describe Alephant::Publisher::Queue::RevalidateProcessor do
 
           expect(writer_double).to receive(:run!)
 
-          subject.consume(message)
+          subject.consume(message_collection)
         end
 
         it 'passes the response to the http_response_processor' do
@@ -73,7 +74,7 @@ RSpec.describe Alephant::Publisher::Queue::RevalidateProcessor do
             .with(message_body, resp_status, resp_body)
             .and_call_original
 
-          subject.consume(message)
+          subject.consume(message_collection)
         end
 
         it "calls the 'ttl' method on the http_response_processor" do
@@ -82,19 +83,19 @@ RSpec.describe Alephant::Publisher::Queue::RevalidateProcessor do
             .with(message_body)
             .and_call_original
 
-          subject.consume(message)
+          subject.consume(message_collection)
         end
 
         it 'deletes the message from the queue' do
           expect(message).to receive(:delete)
 
-          subject.consume(message)
+          subject.consume(message_collection)
         end
 
         it "removes the 'inflight' cache message" do
           expect(cache_double).to receive(:delete)
 
-          subject.consume(message)
+          subject.consume(message_collection)
         end
       end
 
@@ -106,34 +107,34 @@ RSpec.describe Alephant::Publisher::Queue::RevalidateProcessor do
         it 'does not call #run! on the writer' do
           expect(writer_double).to_not receive(:run!)
 
-          expect { subject.consume(message) }
+          expect { subject.consume(message_collection) }
             .to raise_error(Faraday::TimeoutError)
         end
 
         it 'does NOT delele the message from the queue' do
           expect(message).to_not receive(:delete)
 
-          expect { subject.consume(message) }
+          expect { subject.consume(message_collection) }
             .to raise_error(Faraday::TimeoutError)
         end
 
         it "does not remove the 'inflight' cache message" do
           expect(cache_double).to_not receive(:delete)
 
-          expect { subject.consume(message) }
+          expect { subject.consume(message_collection) }
             .to raise_error(Faraday::TimeoutError)
         end
       end
     end
 
     context 'when there is no message passed through' do
-      let(:message) { nil }
+      let(:message_collection) { [] }
 
       it 'does nothing' do
         expect(writer_double).to_not receive(:run!)
         expect(cache_double).to_not receive(:delete)
 
-        subject.consume(message)
+        subject.consume(message_collection)
       end
     end
   end

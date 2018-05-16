@@ -1,10 +1,11 @@
 require 'faraday'
-require 'aws-sdk'
+require "aws-sdk-sqs"
 require 'crimp'
 require 'alephant/publisher/queue/processor'
 require 'alephant/publisher/queue/revalidate_writer'
 require 'json'
 require 'alephant/logger'
+require 'ostruct'
 
 module Alephant
   module Publisher
@@ -20,16 +21,19 @@ module Alephant
           @http_response_processor = http_response_processor
         end
 
-        def consume(message)
-          return if message.nil?
+        def consume(message_collection)
+          return unless message_collection && message_collection.size > 0
+
+          message = message_collection.first
 
           msg_body = message_content(message)
 
+          # @TODO: This is not a http response but a data struct. We should look at renaming this.
           http_response = {
             renderer_id:   msg_body.fetch(:id),
             http_options:  msg_body,
             http_response: get(message),
-            ttl:           http_response_processor.ttl(msg_body)
+            ttl:           http_response_processor.ttl(msg_body).to_s # @TODO: What happens if this is nil? Storage requires this to be a string.
           }
 
           http_message = build_http_message(message, ::JSON.generate(http_response))
@@ -76,11 +80,9 @@ module Alephant
         end
 
         def build_http_message(message, http_response)
-          # I feel dirty...
-          # FIXME: refactor `Writer` so it's not so tightly coupled to a AWS::SQS::ReceivedMessage object
-          http_message = message.dup
-          http_message.instance_variable_set(:@body, http_response)
-          http_message
+          OpenStruct.new({
+            body: http_response
+          })
         end
 
         def get(message)

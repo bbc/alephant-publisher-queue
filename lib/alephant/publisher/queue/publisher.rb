@@ -54,34 +54,36 @@ module Alephant
         end
 
         def get_region
-          opts.queue[:sqs_account_region] || AWS.config.region
+          # @TODO: Where does region come from?
+          opts.queue[:sqs_account_region] || Aws.config[:region] || 'eu-west-1'
         end
 
         def sqs_client
-          @sqs_client ||= AWS::SQS.new(region: get_region)
+          @sqs_client ||= Aws::SQS::Client.new(sqs_queue_options)
         end
 
         def sqs_queue_options
-          (opts.queue[:aws_account_id].nil? ? {} : fallback).tap do |ops|
-            logger.info(
-              "event"   => "SQSQueueOptionsConfigured",
-              "options" => ops,
-              "method"  => "#{self.class}#sqs_queue_options"
-            )
-          end
-        end
+          options = {}
+          options[:endpoint] = ENV['AWS_SQS_ENDPOINT'] if ENV['AWS_SQS_ENDPOINT']
+          options[:region]   = get_region
 
-        def fallback
-          {
-            :queue_owner_aws_account_id => opts.queue[:aws_account_id]
-          }
+          logger.info(
+            "event"   => "SQSQueueOptionsConfigured",
+            "options" => options,
+            "method"  => "#{self.class}#sqs_queue_options"
+          )
+
+          options
         end
 
         def aws_queue
-          queue_url = sqs_client.queues.url_for(
-            opts.queue[:sqs_queue_name], sqs_queue_options
-          )
-          sqs_client.queues[queue_url]
+          options = { queue_name: opts.queue[:sqs_queue_name] }
+          options[:queue_owner_aws_account_id] = opts.queue[:aws_account_id] if opts.queue[:aws_account_id]
+
+          queue_url = sqs_client.get_queue_url(options).queue_url
+
+          resource = Aws::SQS::Resource.new(client: sqs_client)
+          resource.queue(queue_url)
         end
       end
     end

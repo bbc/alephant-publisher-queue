@@ -72,11 +72,13 @@ module Alephant
         end
 
         def storage_opts
-          { ttl: message_content[:ttl] }
+          { ttl: message_content[:ttl] } # @TODO: What happens if this is nil?
         end
 
         def config
-          @config.merge(renderer_id: message_content.fetch(:renderer_id))
+          # @TODO: This part needs refactoring
+          @config[:renderer_id] = message_content.fetch(:renderer_id)
+          @config
         end
 
         def http_data
