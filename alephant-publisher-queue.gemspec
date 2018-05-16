@@ -31,8 +31,6 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "rake"
   spec.add_runtime_dependency "aws-sdk-sqs"
-  spec.add_runtime_dependency "aws-sdk-s3"
-  spec.add_runtime_dependency "aws-sdk-dynamodb"
   spec.add_runtime_dependency "crimp"
   spec.add_runtime_dependency "faraday"
   spec.add_runtime_dependency "dalli-elasticache"

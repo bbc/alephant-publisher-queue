@@ -1,4 +1,3 @@
-require "aws-sdk-dynamodb"
 require "aws-sdk-sqs"
 require "yaml"
 require "alephant/logger"
