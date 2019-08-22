@@ -62,7 +62,7 @@ module Alephant
               component,
               view,
               location_for(component),
-              :msg_id => message.id
+              :msg_id => message.message_id
             )
           end.tap do
             logger.info(
@@ -101,7 +101,7 @@ module Alephant
               "render"         => render.force_encoding("utf-8"),
               "contentType"    => view.content_type,
               "storageOptions" => storage_opts,
-              "messageId"      => message.id,
+              "messageId"      => message.message_id,
               "method"         => "#{self.class}#store"
             )
           end

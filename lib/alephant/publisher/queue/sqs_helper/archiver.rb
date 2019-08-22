@@ -52,7 +52,7 @@ module Alephant
 
           def store_item(message)
             storage.put(
-              storage_key(message.id),
+              storage_key(message.message_id),
               message.body,
               meta_for(message)
             )

@@ -36,7 +36,7 @@ describe Alephant::Publisher::Queue::SQSHelper::Archiver do
         expect(storage).to receive(:put).with(
           "archive/#{time_now.strftime('%d-%m-%Y_%H')}/id",
           message.body,
-          :id        => message.id,
+          :id        => message.message_id,
           :md5       => message.md5,
           :logged_at => time_now.to_s,
           :queue     => message.queue.url
