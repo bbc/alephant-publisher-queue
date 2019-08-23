@@ -8,7 +8,7 @@ describe Alephant::Publisher::Queue::SQSHelper::Archiver do
   let(:message) do
     instance_double(
       "Aws::SQS::ReceivedMessage",
-      :id    => "id",
+      :message_id  => "message_id",
       :md5   => "qux",
       :queue => queue,
       :body  => JSON.generate(msg_body)
@@ -34,12 +34,12 @@ describe Alephant::Publisher::Queue::SQSHelper::Archiver do
 
       specify do
         expect(storage).to receive(:put).with(
-          "archive/#{time_now.strftime('%d-%m-%Y_%H')}/id",
+          "archive/#{time_now.strftime('%d-%m-%Y_%H')}/message_id",
           message.body,
-          :id        => message.message_id,
-          :md5       => message.md5,
-          :logged_at => time_now.to_s,
-          :queue     => message.queue.url
+          :message_id => message.message_id,
+          :md5        => message.md5,
+          :logged_at  => time_now.to_s,
+          :queue      => message.queue.url
         )
         subject.see(message)
       end

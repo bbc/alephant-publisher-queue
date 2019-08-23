@@ -79,10 +79,10 @@ module Alephant
 
           def meta_for(m)
             {
-              :id        => m.id,
-              :md5       => m.md5,
-              :logged_at => DateTime.now.to_s,
-              :queue     => m.queue.url
+              :message_id => m.message_id,
+              :md5        => m.md5,
+              :logged_at  => DateTime.now.to_s,
+              :queue      => m.queue.url
             }
           end
         end
