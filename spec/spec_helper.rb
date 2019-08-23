@@ -3,6 +3,7 @@ $LOAD_PATH << File.join(File.dirname(__FILE__), "..", "lib")
 require "pry"
 require "aws-sdk-sqs"
 require "simplecov"
+require 'dalli-elasticache'
 
 ENV['AWS_REGION'] = 'eu-west-1'
 
