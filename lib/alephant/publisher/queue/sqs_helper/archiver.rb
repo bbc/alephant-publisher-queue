@@ -52,9 +52,10 @@ module Alephant
 
           def store_item(message)
             storage.put(
-              storage_key(message.id),
-              message.body,
-              meta_for(message)
+                storage_key(message.data.message_id),
+                message.data.body,
+                "text/plain",
+                meta_for(message)
             )
           end
 
@@ -78,12 +79,10 @@ module Alephant
           end
 
           def meta_for(m)
-            {
-              :id        => m.id,
-              :md5       => m.md5,
-              :logged_at => DateTime.now.to_s,
-              :queue     => m.queue.url
-            }
+            :id        => m.data.message_id,
+            :md5       => m.data.md5_of_body,
+            :logged_at => DateTime.now.to_s,
+            :queue     => m.queue.url
           end
         end
       end
