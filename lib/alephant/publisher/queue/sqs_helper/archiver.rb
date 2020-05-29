@@ -12,10 +12,10 @@ module Alephant
           attr_reader :storage, :async, :log_message_body, :log_validator
 
           def initialize(storage, opts)
-            @storage          = storage
-            @async            = opts[:async_store]
+            @storage = storage
+            @async = opts[:async_store]
             @log_message_body = opts[:log_archive_message]
-            @log_validator    = opts[:log_validator] || -> _ { true }
+            @log_validator = opts[:log_validator] || -> _ { true }
           end
 
           def see(message)
@@ -43,9 +43,9 @@ module Alephant
             msg_body = body_for(message)
             store_item(message).tap do
               logger.info(
-                "event"       => "MessageStored",
-                "messageBody" => msg_body,
-                "method"      => "#{self.class}#store"
+                  "event" => "MessageStored",
+                  "messageBody" => msg_body,
+                  "method" => "#{self.class}#store"
               ) if log_validator.call(msg_body)
             end
           end
@@ -65,8 +65,8 @@ module Alephant
 
           def log_message_parts(id)
             [
-              "#{self.class}#store:",
-              "'#archive/#{date_key}/#{id}'"
+                "#{self.class}#store:",
+                "'#archive/#{date_key}/#{id}'"
             ]
           end
 
@@ -79,10 +79,12 @@ module Alephant
           end
 
           def meta_for(m)
-            :id        => m.data.message_id,
-            :md5       => m.data.md5_of_body,
-            :logged_at => DateTime.now.to_s,
-            :queue     => m.queue.url
+            {
+                :id => m.data.message_id,
+                :md5 => m.data.md5_of_body,
+                :logged_at => DateTime.now.to_s,
+                :queue => m.queue.url
+            }
           end
         end
       end
